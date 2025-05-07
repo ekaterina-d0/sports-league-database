@@ -1,0 +1,218 @@
+BEGIN;
+
+DROP TABLE IF EXISTS PLAYER_MATCH;
+DROP TABLE IF EXISTS PLAYER_EMERG;
+DROP TABLE IF EXISTS PLAYERS;
+DROP TABLE IF EXISTS EMERG_CONTACTS;
+DROP TABLE IF EXISTS REFS_GAME;
+DROP TABLE IF EXISTS TEAM_GAME;
+DROP TABLE IF EXISTS GAME;
+DROP TABLE IF EXISTS TEAMS;
+DROP TABLE IF EXISTS REFS;
+DROP TABLE IF EXISTS EMERG_CONTACTS;
+DROP TABLE IF EXISTS SCHOOLS;
+
+-- Creating table for 'Schools'
+CREATE TABLE SCHOOLS (
+    SchoolID INT PRIMARY KEY,
+    SchoolName VARCHAR(100),
+    SchoolAdress VARCHAR(100),
+    SchoolCity VARCHAR(50),
+    SchoolZip VARCHAR(10)
+);
+
+-- Creating table for 'Teams'
+CREATE TABLE TEAMS (
+    TeamID INT PRIMARY KEY,
+    SchoolID INT,
+    TeamName VARCHAR(80),
+    TeamColor VARCHAR(20),
+    FOREIGN KEY (SchoolID) REFERENCES SCHOOLS(SchoolID)
+);
+
+-- Creating table for 'Refs'
+CREATE TABLE REFS (
+    RefID INT PRIMARY KEY,
+    Ref_FName VARCHAR(50),
+    Ref_LName VARCHAR(50),
+    Ref_Number VARCHAR(15),
+    Ref_Zip VARCHAR(10)
+);
+
+-- Creating table for 'Game'
+CREATE TABLE GAME (
+    GameID INT PRIMARY KEY,
+    Date_Played DATE,
+    Score VARCHAR(5),
+    Result INT,
+    Season VARCHAR(9)
+);
+
+-- Creating table for 'Refs_Game'
+CREATE TABLE REFS_GAME (
+    RefID INT,
+    GameID INT,
+    PRIMARY KEY (RefID, GameID),
+    FOREIGN KEY (RefID) REFERENCES REFS(RefID),
+    FOREIGN KEY (GameID) REFERENCES GAME(GameID)
+);
+
+-- Creating table for 'Team_Game'
+CREATE TABLE TEAM_GAME (
+    Game INT,
+    Teams INT,
+    PRIMARY KEY (Game, Teams),
+    FOREIGN KEY (Teams) REFERENCES TEAMS(TeamID),
+    FOREIGN KEY (Game) REFERENCES GAME(GameID)
+);
+
+
+-- Creating table for 'EmergencyContacts'
+CREATE TABLE EMERG_CONTACTS (
+    Emerg_ContactID INT PRIMARY KEY,
+    Contact_FName VARCHAR(50),
+    Contact_LName VARCHAR(50),
+    Contact_Number VARCHAR(15)
+);
+
+-- Creating table for 'Players'
+CREATE TABLE PLAYERS (
+    PlayerID INT PRIMARY KEY,
+    PlayerNum INT,
+    Player_FName VARCHAR(50),
+    Player_LName VARCHAR(50),
+    Player_Position VARCHAR(50),
+    Minutes_Played INT,
+    TeamID INT,
+    Emerg_ContactID INT,
+    FOREIGN KEY (TeamID) REFERENCES TEAMS(TeamID)
+);
+
+-- Creating table for 'Player_Emerg'
+CREATE TABLE PLAYER_EMERG (
+    PlayerID INT,
+	Emerg_ContactID INT,
+	PRIMARY KEY (PlayerID, Emerg_ContactID),
+	FOREIGN KEY (Emerg_ContactID) REFERENCES EMERG_CONTACTS(Emerg_ContactID),
+    FOREIGN KEY (PlayerID) REFERENCES PLAYERS(PlayerID)
+);
+
+-- Creating table for 'Player_Match'
+CREATE TABLE PLAYER_MATCH (
+    GameID INT,
+    PlayerID INT,
+    Minutes_Played INT,
+    Goals INT,
+    Assists INT,
+    PRIMARY KEY (GameID, PlayerID),
+    FOREIGN KEY (GameID) REFERENCES GAME(GameID),
+	FOREIGN KEY (PlayerID) REFERENCES PLAYERS(PlayerID)
+);
+
+-- Inserting into SCHOOLS
+INSERT INTO SCHOOLS (SchoolID, SchoolName, SchoolAdress, SchoolCity, SchoolZip) VALUES
+(1, 'Lincoln High', '101 Patriot Way', 'Springfield', '55501'),
+(2, 'Roosevelt Academy', '202 Freedom Blvd', 'Liberty', '55502'),
+(3, 'Jefferson Prep', '303 Liberty St', 'Centerville', '55503'),
+(4, 'Washington High', '404 Union Ave', 'Smalltown', '55504'),
+(5, 'Hamilton Institute', '505 Revolution Rd', 'Newtown', '55505');
+
+-- Inserting into TEAMS
+INSERT INTO TEAMS (TeamID, SchoolID, TeamName, TeamColor) VALUES
+(1, 1, 'Lincoln Lions', 'Blue'),
+(2, 2, 'Roosevelt Ravens', 'Red'),
+(3, 3, 'Jefferson Jaguars', 'Green'),
+(4, 4, 'Washington Wolves', 'Yellow'),
+(5, 5, 'Hamilton Hawks', 'Silver');
+
+-- Inserting into REFS
+INSERT INTO REFS (RefID, Ref_FName, Ref_LName, Ref_Number, Ref_Zip) VALUES
+(1, 'John', 'Doe', '555-1234', '55601'),
+(2, 'Jane', 'Smith', '555-5678', '55602'),
+(3, 'Alice', 'Walker', '555-2222', '55603'),
+(4, 'Bob', 'Johnson', '555-3333', '55604');
+
+-- Inserting into EMERG_CONTACTS
+INSERT INTO EMERG_CONTACTS (Emerg_ContactID, Contact_FName, Contact_LName, Contact_Number) VALUES
+(1, 'Alan', 'Jones', '555-7890'),
+(2, 'Beth', 'Smith', '555-0987'),
+(3, 'Chris', 'Brown', '555-4444'),
+(4, 'Diana', 'Ross', '555-5555');
+
+-- Inserting into PLAYERS
+INSERT INTO PLAYERS (PlayerID, PlayerNum, Player_FName, Player_LName, Player_Position, Minutes_Played, TeamID, Emerg_ContactID) VALUES
+(1, 9, 'Mike', 'Jones', 'Forward', 90, 1, 1),
+(2, 10, 'Sara', 'Smith', 'Midfielder', 85, 2, 2),
+(3, 11, 'Tom', 'Harris', 'Defender', 90, 3, 3),
+(4, 12, 'Emily', 'Clark', 'Goalkeeper', 90, 4, 4),
+(5, 8, 'Luke', 'Jordan', 'Midfielder', 75, 1, 1),
+(6, 7, 'Olivia', 'Grant', 'Forward', 80, 2, 2),
+(7, 5, 'Evan', 'Turner', 'Forward', 85, 3, 3),
+(8, 4, 'Maria', 'Gonzalez', 'Defender', 90, 4, 4),
+(9, 15, 'Isaac', 'Newton', 'Midfielder', 88, 5, 1),
+(10, 16, 'Grace', 'Hopper', 'Goalkeeper', 90, 5, 2);
+
+-- Inserting into PLAYER_EMERG
+INSERT INTO PLAYER_EMERG (PlayerID, Emerg_ContactID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 1),
+(6, 2),
+(7, 3),
+(8, 4),
+(9, 3),
+(10, 2);
+
+-- Inserting into GAME
+INSERT INTO GAME (GameID, Date_Played, Score, Result, Season) VALUES
+(1, '2024-03-01', '3-2', 1, '2023-2024'), -- Home team (Lincoln Lions) wins
+(2, '2024-03-15', '1-1', 3, '2023-2024'), -- Draw
+(3, '2024-03-22', '2-2', 3, '2023-2024'), -- Draw between Jefferson Jaguars and Washington Wolves
+(4, '2024-04-02', '0-1', 2, '2023-2024'), -- Washington Wolves win against Lincoln Lions
+(5, '2024-04-09', '3-1', 1, '2023-2024'), -- Hamilton Hawks win against Jefferson Jaguars
+(6, '2024-04-16', '1-2', 2, '2023-2024'); -- Roosevelt Ravens win against Washington Wolves
+
+-- Inserting into REFS_GAME
+INSERT INTO REFS_GAME (RefID, GameID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 1),
+(1, 3),
+(2, 6),
+(3, 4),
+(4, 4),
+(3, 5);
+
+-- Inserting into TEAM_GAME
+-- Assuming Team_GameID 1 & 2 are for Game 1, and 3 & 4 are for Game 2
+INSERT INTO TEAM_GAME (Game, Teams) VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 2),
+(3, 3),
+(3, 4),
+(4, 1),
+(4, 4),
+(5, 3),
+(5, 5),
+(6, 2),
+(6, 4);
+
+-- Inserting into PLAYER_MATCH
+INSERT INTO PLAYER_MATCH (GameID, PlayerID, Minutes_Played, Goals, Assists) VALUES
+(1, 1, 90, 2, 0), -- Mike Jones's performance in Game 1
+(1, 2, 85, 1, 1), -- Sara Smith's performance in Game 1
+(3, 3, 90, 0, 0), -- Tom Harris in Game 3
+(3, 4, 90, 0, 0), -- Emily Clark in Game 3, assuming a strong defensive game
+(4, 1, 90, 0, 0), -- Mike Jones in Game 4
+(4, 4, 90, 1, 0), -- Emily Clark scores the winning goal in Game 4
+(5, 7, 85, 2, 0), -- Evan Turner scored twice in Game 5
+(5, 9, 88, 1, 1), -- Isaac Newton scored once and assisted in Game 5
+(6, 2, 90, 1, 0), -- Sara Smith scored once in Game 6
+(6, 8, 90, 0, 0); -- Maria Gonzalez played defensively in Game 6
+
+COMMIT;
